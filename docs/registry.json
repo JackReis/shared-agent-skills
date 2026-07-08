@@ -1,0 +1,14 @@
+[
+  {"name":"agents-sdk","description":"Agents SDK for building multi-agent systems.","runtimes":["agents","claude","codex","hermes"],"category":"sdk","version":"1.0.0"},
+  {"name":"cloudflare","description":"Cloudflare Workers development patterns and best practices.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"cloudflare-email-service","description":"Cloudflare Email Worker routing and processing.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"cloudflare-one","description":"Cloudflare One zero-trust access configuration.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"cloudflare-one-migrations","description":"Migrate Cloudflare One configurations between zones.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"durable-objects","description":"Cloudflare Durable Objects stateful compute.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"sandbox-sdk","description":"Sandbox SDK for isolated code execution.","runtimes":["agents","claude","codex","hermes"],"category":"sdk","version":"1.0.0"},
+  {"name":"skillify","description":"Convert code into reusable agent skills.","runtimes":["claude","hermes"],"category":"tooling","version":"0.1.0"},
+  {"name":"turnstile-spin","description":"Cloudflare Turnstile human verification integration.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"web-perf","description":"Web performance optimization patterns.","runtimes":["agents","claude","codex","hermes"],"category":"performance","version":"1.0.0"},
+  {"name":"workers-best-practices","description":"Cloudflare Workers best practices guide.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"},
+  {"name":"wrangler","description":"Cloudflare Wrangler CLI for deploying Workers.","runtimes":["agents","claude","codex","hermes"],"category":"cloudflare","version":"1.0.0"}
+]
