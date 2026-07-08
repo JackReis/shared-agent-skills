@@ -32,6 +32,55 @@
   --border-whisper: #30302e; --border-strong: #3D3A36;
 }
 
+/* ============== SOLAR THEME MODES ============== */
+[data-theme="dawn"] {
+  --canvas: #E4E8E2; --surface: #ECEFE8; --surface-raised: #E0E5DC;
+  --text-primary: #1F2A26; --text-body: #2A3B30; --text-muted: #6B7B70; --text-subtle: #8A9A8E;
+  --border-whisper: #D4D9D0; --border-strong: #C4C9C0;
+  --terracotta: #A56D4A; --terracotta-ink: #7A4A30;
+  --sage-deep: #506050; --sage-mid: #607060; --sage-light: #A0B098;
+  --leaf-green: #507634; --grain-gold: #F1C85E; --grain-gold-ink: #8A6A10;
+  --soft-teal: #4A8A8A; --soft-teal-ink: #2E6262;
+  --shadow-whisper: rgba(0,0,0,0.04) 0px 2px 12px;
+  --shadow-elevated: rgba(0,0,0,0.08) 0px 4px 24px;
+}
+
+[data-theme="sunrise"] {
+  --canvas: #F1E8E2; --surface: #F8F0E8; --surface-raised: #ECE0D6;
+  --text-primary: #2A251F; --text-body: #3A322C; --text-muted: #7A6B61; --text-subtle: #9A8A80;
+  --border-whisper: #E0D4C8; --border-strong: #D0C4B8;
+  --terracotta: #A56D4A; --terracotta-ink: #7A4A30;
+  --sage-deep: #506050; --sage-mid: #607060; --sage-light: #A0B098;
+  --leaf-green: #507634; --grain-gold: #F1C85E; --grain-gold-ink: #8A6A10;
+  --soft-teal: #4A8A8A; --soft-teal-ink: #2E6262;
+  --shadow-whisper: rgba(0,0,0,0.04) 0px 2px 12px;
+  --shadow-elevated: rgba(0,0,0,0.08) 0px 4px 24px;
+}
+
+[data-theme="twilight"] {
+  --canvas: #F0E8D4; --surface: #F5EDE0; --surface-raised: #E8E0CC;
+  --text-primary: #2A2015; --text-body: #3A3025; --text-muted: #7A6E5A; --text-subtle: #9A8A75;
+  --border-whisper: #DCCFB8; --border-strong: #CCBFA8;
+  --terracotta: #A56D4A; --terracotta-ink: #7A4A30;
+  --sage-deep: #506050; --sage-mid: #607060; --sage-light: #A0B098;
+  --leaf-green: #507634; --grain-gold: #F1C85E; --grain-gold-ink: #8A6A10;
+  --soft-teal: #4A8A8A; --soft-teal-ink: #2E6262;
+  --shadow-whisper: rgba(0,0,0,0.04) 0px 2px 12px;
+  --shadow-elevated: rgba(0,0,0,0.08) 0px 4px 24px;
+}
+
+[data-theme="dusk"] {
+  --canvas: #2A2530; --surface: #302B38; --surface-raised: #383340;
+  --text-primary: #D8D2C8; --text-body: #C8C2B8; --text-muted: #9A92A0; --text-subtle: #7A7280;
+  --border-whisper: #3A3540; --border-strong: #4A4550;
+  --terracotta: #C9A084; --terracotta-ink: #D4B04A;
+  --sage-deep: #A0B098; --sage-mid: #8A9A8E; --sage-light: #6B7B70;
+  --leaf-green: #7A9A6A; --grain-gold: #D4B04A; --grain-gold-ink: #B8A040;
+  --soft-teal: #6ABABA; --soft-teal-ink: #4A8A8A;
+  --shadow-whisper: rgba(0,0,0,0.15) 0px 2px 12px;
+  --shadow-elevated: rgba(0,0,0,0.25) 0px 4px 24px;
+}
+
 /* ============== RESET & BASE ============== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -41,7 +90,7 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   font-size: 15px;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition: background-color 2s ease, color 2s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -723,33 +772,104 @@ footer p {
     });
   });
 
-  // ============== THEME TOGGLE ==============
+  // ============== 6-MODE SOLAR THEME SYSTEM ==============
+  var THEME_CYCLE = ['light','dawn','sunrise','twilight','dusk','dark'];
+  var themeSvg = themeToggle.querySelector('svg');
+  var iconRotation = 0;
+
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem('shared-skills-theme', theme); } catch(e) {}
   }
 
-  // Init theme
-  var savedTheme = null;
-  try { savedTheme = localStorage.getItem('shared-skills-theme'); } catch(e) {}
-  if (!savedTheme) {
-    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    savedTheme = prefersDark ? 'dark' : 'light';
-  }
-  applyTheme(savedTheme);
+  // Simple solar calc: visitor's local hour with approximate sunrise=6am / sunset=7pm
+  function naturalTheme() {
+    var now = new Date();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var timeDec = hour + minute / 60.0;
+    var sunrise = 6.0;   // ~6:00 AM
+    var sunset = 19.0;   // ~7:00 PM
 
-  // Set initial icon rotation based on current theme
-  var themeSvg = themeToggle.querySelector('svg');
-  if (savedTheme === 'dark') {
-    themeSvg.style.transform = 'rotate(180deg)';
+    // Theme windows (converted to decimal hours):
+    // dawn:     50min before sunrise to 10min before  → 5.17 to 5.83
+    // sunrise:  10min before to 10min after           → 5.83 to 6.17
+    // twilight: 10min after sunrise to 30min after /  30min before to 10min after sunset
+    // light:    daytime (between twilight windows)
+    // dusk:     10min after sunset to 50min after      → 19.17 to 19.83
+    // dark:     night
+
+    if (timeDec >= sunrise - 50/60 && timeDec < sunrise - 10/60) {
+      return 'dawn';
+    }
+    if (timeDec >= sunrise - 10/60 && timeDec < sunrise + 10/60) {
+      return 'sunrise';
+    }
+    if (timeDec >= sunrise + 10/60 && timeDec < sunrise + 30/60) {
+      return 'twilight';
+    }
+    if (timeDec >= sunset - 30/60 && timeDec < sunset + 10/60) {
+      return 'twilight';
+    }
+    if (timeDec >= sunset + 10/60 && timeDec < sunset + 50/60) {
+      return 'dusk';
+    }
+    if (timeDec >= sunset + 50/60 || timeDec < sunrise - 50/60) {
+      return 'dark';
+    }
+    return 'light';
   }
+
+  function getStoredOverride() {
+    try {
+      var raw = localStorage.getItem('shared-skills-theme-override');
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      // Check if the stored date is today
+      var today = new Date().toDateString();
+      if (parsed.date === today && THEME_CYCLE.indexOf(parsed.theme) !== -1) {
+        return parsed.theme;
+      }
+      // Stale override — clear it
+      localStorage.removeItem('shared-skills-theme-override');
+      return null;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function storeOverride(theme) {
+    try {
+      localStorage.setItem('shared-skills-theme-override', JSON.stringify({
+        theme: theme,
+        date: new Date().toDateString()
+      }));
+    } catch(e) {}
+  }
+
+  // Determine initial theme
+  var storedOverride = getStoredOverride();
+  var initialTheme = storedOverride || naturalTheme();
+  applyTheme(initialTheme);
+
+  // Set initial icon rotation based on theme index
+  var initialIdx = THEME_CYCLE.indexOf(initialTheme);
+  if (initialIdx === -1) initialIdx = 0;
+  iconRotation = initialIdx * 60;
+  themeSvg.style.transform = 'rotate(' + iconRotation + 'deg)';
 
   themeToggle.addEventListener('click', function() {
     var current = document.documentElement.getAttribute('data-theme');
-    var next = current === 'dark' ? 'light' : 'dark';
-    var svg = themeToggle.querySelector('svg');
-    svg.style.transform = next === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)';
+    var currentIdx = THEME_CYCLE.indexOf(current);
+    if (currentIdx === -1) currentIdx = 0;
+    var nextIdx = (currentIdx + 1) % THEME_CYCLE.length;
+    var next = THEME_CYCLE[nextIdx];
+
+    // Cumulative 60° rotation per click (always forward)
+    iconRotation += 60;
+    themeSvg.style.transform = 'rotate(' + iconRotation + 'deg)';
+
     applyTheme(next);
+    storeOverride(next);
   });
 
   // ============== AUTO-UPDATE: fetch registry.json ==============
