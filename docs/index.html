@@ -109,9 +109,6 @@ h1 {
   height: 26px;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.theme-toggle.spinning svg {
-  transform: rotate(60deg);
-}
 
 /* ============== DIVIDER ============== */
 .divider {
@@ -486,16 +483,15 @@ footer p {
         <p class="subtitle">Skills that work across Hermes<span class="sep">·</span>Claude Code<span class="sep">·</span>Codex<span class="sep">·</span>Agents SDK</p>
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark and light theme" title="Toggle theme">
-        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Semicircle tide dial -->
-          <path d="M3 18 A11 11 0 0 1 25 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color: var(--text-muted)"/>
-          <path d="M3 18 A11 11 0 0 1 14 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color: var(--terracotta)"/>
-          <circle cx="14" cy="18" r="2" fill="currentColor" style="color: var(--text-primary)"/>
-          <line x1="14" y1="18" x2="14" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color: var(--text-primary)"/>
-          <!-- tick marks -->
-          <line x1="3" y1="18" x2="5" y2="18" stroke="currentColor" stroke-width="1.2" style="color: var(--text-subtle)"/>
-          <line x1="23" y1="18" x2="25" y2="18" stroke="currentColor" stroke-width="1.2" style="color: var(--text-subtle)"/>
-          <line x1="14" y1="7" x2="14" y2="9" stroke="currentColor" stroke-width="1.2" style="color: var(--text-subtle)"/>
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" id="themeIcon">
+          <!-- Sun behind horizon -->
+          <line x1="2" y1="18" x2="26" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-muted)"/>
+          <path d="M8 18 A6 6 0 0 1 20 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" style="color: var(--terracotta)"/>
+          <line x1="14" y1="3" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6" style="color: var(--text-primary)"/>
+          <line x1="6" y1="6" x2="8.5" y2="8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6" style="color: var(--text-primary)"/>
+          <line x1="22" y1="6" x2="19.5" y2="8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6" style="color: var(--text-primary)"/>
+          <line x1="3" y1="11" x2="6" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6" style="color: var(--text-subtle)"/>
+          <line x1="25" y1="11" x2="22" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6" style="color: var(--text-subtle)"/>
         </svg>
       </button>
     </div>
@@ -576,8 +572,6 @@ footer p {
   // ============== STATE ==============
   let skills = INLINE_SKILLS;
   let activeFilter = 'all';
-  let rotation = 0;
-
   // ============== DOM REFS ==============
   const grid = document.getElementById('cardGrid');
   const resultCount = document.getElementById('resultCount');
@@ -744,14 +738,17 @@ footer p {
   }
   applyTheme(savedTheme);
 
+  // Set initial icon rotation based on current theme
+  var themeSvg = themeToggle.querySelector('svg');
+  if (savedTheme === 'dark') {
+    themeSvg.style.transform = 'rotate(180deg)';
+  }
+
   themeToggle.addEventListener('click', function() {
     var current = document.documentElement.getAttribute('data-theme');
     var next = current === 'dark' ? 'light' : 'dark';
-    // Spin forward
-    rotation += 60;
     var svg = themeToggle.querySelector('svg');
-    svg.style.transform = 'rotate(' + rotation + 'deg)';
-    themeToggle.classList.add('spinning');
+    svg.style.transform = next === 'dark' ? 'rotate(180deg)' : 'rotate(0deg)';
     applyTheme(next);
   });
 
