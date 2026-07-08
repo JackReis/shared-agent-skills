@@ -536,13 +536,14 @@ footer p {
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark and light theme" title="Toggle theme">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" id="themeIcon">
-          <!-- Hexagon wedge: 6 triangular wedges, one filled to show current mode -->
-          <polygon points="14,14 14,2 24.4,8" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-0"/>
-          <polygon points="14,14 24.4,8 24.4,20" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-1"/>
-          <polygon points="14,14 24.4,20 14,26" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-2"/>
-          <polygon points="14,14 14,26 3.6,20" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-3"/>
-          <polygon points="14,14 3.6,20 3.6,8" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-4"/>
-          <polygon points="14,14 3.6,8 14,2" fill="none" stroke="currentColor" stroke-width="1.5" class="wedge-5"/>
+          <!-- Hexagon wedge: 6 triangular wedges, cumulative fill to show current mode -->
+          <polygon points="14,2 24.4,8 24.4,20 14,26 3.6,20 3.6,8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" class="hex-outline"/>
+          <polygon points="14,14 14,2 24.4,8" fill="none" class="wedge-0"/>
+          <polygon points="14,14 24.4,8 24.4,20" fill="none" class="wedge-1"/>
+          <polygon points="14,14 24.4,20 14,26" fill="none" class="wedge-2"/>
+          <polygon points="14,14 14,26 3.6,20" fill="none" class="wedge-3"/>
+          <polygon points="14,14 3.6,20 3.6,8" fill="none" class="wedge-4"/>
+          <polygon points="14,14 3.6,8 14,2" fill="none" class="wedge-5"/>
         </svg>
       </button>
     </div>
@@ -786,11 +787,10 @@ footer p {
   function updateWedge(theme) {
     var idx = THEME_CYCLE.indexOf(theme);
     if (idx === -1) idx = 0;
-    themeWedges.forEach(function(w) {
-      w.setAttribute('fill', 'none');
+    // Cumulative fill: wedges 0..idx are filled (hexagon fills up as you cycle)
+    themeWedges.forEach(function(w, i) {
+      w.setAttribute('fill', i <= idx ? 'currentColor' : 'none');
     });
-    var active = themeSvg.querySelector('.wedge-' + idx);
-    if (active) active.setAttribute('fill', 'currentColor');
   }
 
   // Simple solar calc: visitor's local hour with approximate sunrise=6am / sunset=7pm
