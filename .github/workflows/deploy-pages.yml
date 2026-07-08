@@ -1,31 +1,55 @@
-name: Deploy GitHub Pages
+name: Update docs on push
 
 on:
   push:
     branches: [main]
     paths:
-      - 'docs/**'
-      - '.github/workflows/deploy-pages.yml'
+      - '**/SKILL.md'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  deploy:
+  update-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
+      - name: Regenerate docs/registry.json from SKILL.md files
+        run: |
+          python3 -c "
+          import os, json, re, glob
+          skills = []
+          for md_path in sorted(glob.glob('*/SKILL.md') + glob.glob('*/*/SKILL.md')):
+              with open(md_path) as f:
+                  content = f.read()
+              # Extract frontmatter
+              fm = {}
+              fm_match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
+              if fm_match:
+                  for line in fm_match.group(1).split('\n'):
+                      if ':' in line:
+                          k, v = line.split(':', 1)
+                          fm[k.strip()] = v.strip().strip('\"').strip(\"'\")
+              skills.append({
+                  'name': fm.get('name', os.path.basename(os.path.dirname(md_path))),
+                  'description': fm.get('description', ''),
+                  'version': fm.get('version', '0.1.0'),
+                  'category': fm.get('category', ''),
+                  'runtimes': ['agents', 'claude', 'codex', 'hermes'],
+              })
+          registry = {'total_skills': len(skills), 'skills': skills, 'generated_at': __import__('datetime').datetime.now().isoformat()}
+          os.makedirs('docs', exist_ok=True)
+          with open('docs/registry.json', 'w') as f:
+              json.dump(registry, f, indent=2)
+          print(f'Generated registry with {len(skills)} skills')
+          "
 
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+      - name: Commit updated docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/registry.json
+          git diff --staged --quiet || git commit -m "auto: update docs/registry.json [skip ci]"
+          git push
