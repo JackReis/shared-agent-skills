@@ -1,5 +1,5 @@
 {
-  "total_skills": 13,
+  "total_skills": 14,
   "skills": [
     {
       "name": "agents-sdk",
@@ -98,6 +98,18 @@
       ]
     },
     {
+      "name": "skill-library-management",
+      "description": "Discover, register, and maintain Hermes skills from non-default paths (plugin directories, external repos, shared vaults). Use when skills are missing from `skills_list()`, when the user mentions plugin skills, when symlinking skills, or when reconciling duplicate/overlapping skills between the default tree and external sources.",
+      "version": "0.1.0",
+      "category": "",
+      "runtimes": [
+        "agents",
+        "claude",
+        "codex",
+        "hermes"
+      ]
+    },
+    {
       "name": "skillify",
       "description": ">",
       "version": "2.0.0",
@@ -158,5 +170,5 @@
       ]
     }
   ],
-  "generated_at": "2026-07-15T21:40:46.673607"
+  "generated_at": "2026-07-15T22:01:50.439529"
 }
