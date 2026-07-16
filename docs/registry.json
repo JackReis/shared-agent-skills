@@ -1,5 +1,5 @@
 {
-  "total_skills": 14,
+  "total_skills": 15,
   "skills": [
     {
       "name": "agents-sdk",
@@ -65,6 +65,18 @@
       "name": "cloudflare",
       "description": "Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), feature flags (Flagship), networking (Tunnel, Spectrum), security (WAF, DDoS), and infrastructure-as-code (Terraform, Pulumi). Use for any Cloudflare development task. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
       "version": "0.1.0",
+      "category": "",
+      "runtimes": [
+        "agents",
+        "claude",
+        "codex",
+        "hermes"
+      ]
+    },
+    {
+      "name": "cron-automation",
+      "description": "Use when scheduling recurring polls, read-only monitors, or background jobs that must survive shell session boundaries.",
+      "version": "1.1.0",
       "category": "",
       "runtimes": [
         "agents",
@@ -170,5 +182,5 @@
       ]
     }
   ],
-  "generated_at": "2026-07-15T22:01:50.439529"
+  "generated_at": "2026-07-16T02:46:09.799307"
 }
