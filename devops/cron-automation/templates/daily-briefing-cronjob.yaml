@@ -1,0 +1,40 @@
+# Daily Briefing Cronjob Template
+
+## Overview
+This template provides a **boilerplate cronjob** for the Google Daily Briefing workflow. Uses inline session_search for log compilation (the `obsidian-librarian` skill does not exist).
+
+---
+
+## Pre-Flight Job (3:30 AM)
+```yaml
+name: Daily Briefing Pre-Flight
+schedule: "30 3 * * *"
+prompt: |
+  1. **Check Google Daily Briefing Availability**:
+     a. **Gmail (first)**: Use himalaya to search inbox for sender `noreply@google.com`. If not found, search `[Gmail]/All Mail`.
+     b. **Web (fallback)**: Use `browser_navigate` to `https://gemini.google.com/daily-brief` and extract content.
+     c. If neither found, note the gap in the session context.
+
+  2. **Query Session Logs**:
+     a. Use `session_search()` to browse recent sessions and scroll into each for achievements.
+     b. If delegate_task is available, parallelize one subagent per session to summarize.
+
+  3. **Create/Update Obsidian Note**:
+     a. **Path**: `=notes/daily/$(date +%Y-%m-%d).md`.
+     b. **Template**: Use `=notes/templates/daily-note-template-latest.md` (NOT `daily-note-latest.md`).
+     c. **Backup**: If the note exists, back it up (`cp YYYY-MM-DD.md YYYY-MM-DD.md.bak`).
+
+  4. **Insert Sections**:
+     a. Add briefing content under `## Gemini Briefing`.
+     b. Add session summaries under `### Hermes Sessions` in `## 🤖 Session Log & Lens Tracking`.
+     c. Add blockers under `## Blockers`.
+
+  5. **Verify**: Check for `## Gemini Briefing`, `## 🤖 Session Log & Lens Tracking`, and `## Blockers`.
+
+  6. **Notify Fleet**: Post summary to `=notes/claude/coordination/inbox-fleet.md`.
+skills:
+  - hermes-agent
+  - obsidian
+  - himalaya
+deliver: origin
+```
