@@ -218,6 +218,8 @@ When Hermes cron is unavailable, fall back to traditional `crontab`.
 ...
 ## Specific Monitoring Scripts (Advanced Use Case: Fleet Polling)
 
+For a profile-scoped, low-resource monitor that fingerprints a curated shelfmark set and captures to OB1 only on material change, see `references/low-resource-ob1-shelfmark-scout-20260607.md`.
+
 For fleet coordination polling — reading `INFRASTRUCTURE-TASKS.md`, `Coordination/README.md`, and recent session handoffs — use the report template in `templates/fleet-poll-report-template.md`.
 
 - **Script Structure:** For complex, multi-component monitoring (like polling system state, handoffs, or repo status), the polling script must enforce its own logging and locking mechanisms within the core script (`$HOME/.hermes/cubby/scripts/poll-fleet-awareness.sh`).
