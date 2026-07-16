@@ -25,9 +25,11 @@ codex mcp login cloudflare-api
 
 Preserve a timestamped `~/.codex/config.toml` backup before adding the server.
 
+`codex mcp add` can persist the server registration and then immediately wait for an OAuth callback. Treat both `add` and `login` as interactive operations: use a PTY or a tracked background process with a bounded timeout. If the callback times out, run `codex mcp get cloudflare-api` before retrying—do not create a duplicate registration when the add already succeeded. Restart only `codex mcp login cloudflare-api`, then verify successful completion and a fresh MCP query.
+
 #### Keychain pitfall
 
-An old `Codex MCP Credentials` item can remain ACL-bound to a removed executable such as `/Applications/Codex.app/Contents/Resources/codex`. `security find-generic-password` may then show a macOS approval dialog but still fail (observed exit status `24`). Do **not** weaken the item's ACL or extract the encrypted Keychain database. Re-register the official MCP and complete OAuth with the current Codex CLI instead.
+After ChatGPT and Codex were combined into the same app, the standalone `Codex.app` executable disappeared. An old `Codex MCP Credentials` item can therefore remain ACL-bound to the former path, such as `/Applications/Codex.app/Contents/Resources/codex`. `security find-generic-password` may then show a macOS approval dialog but still fail (observed exit status `24`). Do **not** weaken the item's ACL or extract the encrypted Keychain database. Re-register the official MCP and complete OAuth with the current Codex CLI instead.
 
 #### MCP execution pitfall
 
@@ -75,9 +77,9 @@ Because this disables Codex safeguards, all of these controls are mandatory:
 6. **Create the minimum allow policy.** Prefer one exact email or a verified IdP group; use precedence `1`; keep `exclude` and `require` empty unless requirements say otherwise.
 7. **Fresh API readback.** Require one exact-domain app, the intended settings, and exactly the intended policies. All calls must return 2xx, `success: true`, and `errors: []`.
 8. **Prove Access interception before opening the origin.** Anonymous requests to `/` and sensitive API routes must redirect to the account's `/cdn-cgi/access/login/<hostname>` surface. Spoofed identity headers must still redirect. Follow the redirect only far enough to prove the login page loads.
-9. **Open only the intended ingress.** Back up the tunnel config, replace the hostname's `http_status:403` service with the private origin, validate the custom config, and restart its service manager. If validation or restart fails, restore the backup and restart the fail-closed config.
+9. **Open only the intended ingress.** Back up the tunnel config, replace the hostname's `http_status:403` service with the private origin, validate the custom config, and restart its service manager. Locate the ingress structurally or with a stanza-scoped guard that recognizes YAML list entries such as `- hostname:`; never depend on an exact unprefixed `hostname:` line. Assert exactly one hostname stanza and exactly one expected old service before writing. If validation or restart fails, restore the backup and restart the fail-closed config.
 10. **Post-cutover verification.** Repeat anonymous redirect, spoofed-header denial, login-page load, private-origin health, and connector-origin health tests.
-11. **Authorized verification.** Have the user complete authentication. Query `GET /accounts/{account_id}/access/logs/access_requests` with exact email and time bounds; require a matching app UID/domain record with `action: login` and `allowed: true`.
+11. **Authorized verification.** Have the user complete authentication. Query `GET /accounts/{account_id}/access/logs/access_requests` with exact app UID, email, and time bounds; require a matching record with `action: login` and `allowed: true`. Normalize the API's `allowed` field because some responses encode it as the string `"true"` rather than a JSON boolean.
 
 ### Useful commands
 
